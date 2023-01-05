@@ -23,7 +23,7 @@ for(i in studies_$studyId){
   }
   try(data_ <- cBioDataPack(i, ask = F))
   if(exists("data_")){
-    saveRDS(data_, paste0("~/Documents/BFX_proj/Data/TCGA_PanCancer/", i, ".rds"))
+    saveRDS(data_, paste0("~/Documents/BFX_proj/_data_public/TCGA_PanCancer/", i, ".rds"))
     studies_[i, "loaded"] <- date()
     studies_[i, "method"] <- "cBioDataPack()"
     unlink("~/.cache/cBioPortalData/")
@@ -32,12 +32,12 @@ for(i in studies_$studyId){
     studies_[i, "loaded"] <- "fail"
     studies_[i, "method"] <- "manual" # download from cBioPortal directly
   }
-  write.csv(studies_, "~/Documents/BFX_proj/Data/TCGA_PanCancer/checkpoint.csv")
+  write.csv(studies_, "~/Documents/BFX_proj/_data_public/TCGA_PanCancer/checkpoint.csv")
   rm(i)
 }
 
 ###---extract and merge RSEM, metadata------------------------------------------
-checkpoint <- read.csv("Documents/BFX_proj/Data/TCGA_PanCancer/checkpoint.csv", row.names = 1)
+checkpoint <- read.csv("Documents/BFX_proj/_data_public/TCGA_PanCancer/checkpoint.csv", row.names = 1)
 
 # scan for universal genes and metadata
 ## package loaded data
@@ -60,7 +60,7 @@ for(i in checkpoint$studyId[checkpoint$loaded != "fail"]){
 }
 ## manually loaded data
 for(i in checkpoint$studyId[checkpoint$loaded == "fail"]){
-  data_file_ <- paste0("Documents/BFX_proj/Data/TCGA_PanCancer/", i,"/") # point to file
+  data_file_ <- paste0("Documents/BFX_proj/_data_public/TCGA_PanCancer/", i,"/") # point to file
   rsem__ <- read.table(paste0(data_file_, "data_mrna_seq_v2_rsem.txt"), sep = "", header = T, fill = T) # extract rsem
   rsem_ <- as.matrix(rsem__[, 3:ncol(rsem__)])
   rownames(rsem_) <- rsem__$Hugo_Symbol
@@ -85,7 +85,7 @@ for(i in checkpoint$studyId[checkpoint$loaded == "fail"]){
 # merge data
 ## package loaded data
 for(i in checkpoint$studyId[checkpoint$loaded != "fail"]){
-  data_ <- readRDS(paste0("Documents/BFX_proj/Data/TCGA_PanCancer/", i,".rds")) # load data
+  data_ <- readRDS(paste0("Documents/BFX_proj/_data_public/TCGA_PanCancer/", i,".rds")) # load data
   rsem_ <- assay(data_, "mrna_seq_v2_rsem") # extract rsem
   rsem_ <- rsem_[common_genes, ]
   meta_ <- as.data.frame(colData(data_), row.names = colData(data_)$SAMPLE_ID) # extract meta
@@ -110,7 +110,7 @@ for(i in checkpoint$studyId[checkpoint$loaded != "fail"]){
 }
 ## manually loaded data
 for(i in checkpoint$studyId[checkpoint$loaded == "fail"]){
-  data_file_ <- paste0("Documents/BFX_proj/Data/TCGA_PanCancer/", i,"/") # point to file
+  data_file_ <- paste0("Documents/BFX_proj/_data_public/TCGA_PanCancer/", i,"/") # point to file
   rsem__ <- read.table(paste0(data_file_, "data_mrna_seq_v2_rsem.txt"), sep = "", header = T, fill = T) # extract rsem
   rsem_ <- as.matrix(rsem__[, 3:ncol(rsem__)])
   rownames(rsem_) <- rsem__$Hugo_Symbol
@@ -140,5 +140,5 @@ for(i in checkpoint$studyId[checkpoint$loaded == "fail"]){
   rm(i, list = ls()[grepl("_$", ls())])
 }
 
-saveRDS(rsem, "Documents/BFX_proj/Data/TCGA_PanCancer/_processed/tcga_pancancer_rsem_FZ01.rds")
-saveRDS(meta, "Documents/BFX_proj/Data/TCGA_PanCancer/_processed/tcga_pancancer_metadata_FZ01.rds")
+saveRDS(rsem, "Documents/BFX_proj/_data_public/TCGA_PanCancer/_processed/tcga_pancancer_rsem_FZ01.rds")
+saveRDS(meta, "Documents/BFX_proj/_data_public/TCGA_PanCancer/_processed/tcga_pancancer_metadata_FZ01.rds")
